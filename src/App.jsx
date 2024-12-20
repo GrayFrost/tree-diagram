@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import "./App.css";
 
 function initDiagram(showIndex, theme) {
@@ -156,6 +158,7 @@ function initDiagram(showIndex, theme) {
 }
 
 function App() {
+  const { toast } = useToast();
   const [theme, setTheme] = useState({
     nodeStroke: "#1890ff",
     linkStroke: "rgba(24, 144, 255, 0.8)",
@@ -164,17 +167,9 @@ function App() {
   // 状态管理
   const [nodeDataArray, setNodeDataArray] = useState([
     { key: 0, text: "控股公司" },
-    { key: 1, text: "子\n公\n司\nA" },
-    { key: 2, text: "子公司B" },
-    { key: 3, text: "参股公司" },
   ]);
 
-  const [linkDataArray, setLinkDataArray] = useState([
-    { key: -1, from: 0, to: 1, shareRatio: 100 },
-    { key: -2, from: 0, to: 2, shareRatio: 100 },
-    { key: -3, from: 1, to: 3, shareRatio: 51 },
-    { key: -4, from: 2, to: 3, shareRatio: 49 },
-  ]);
+  const [linkDataArray, setLinkDataArray] = useState([]);
 
   // 新增节点的表单状态
   const [newNodeText, setNewNodeText] = useState("");
@@ -192,7 +187,20 @@ function App() {
 
   // 添加新节点
   const handleAddNode = () => {
-    if (!newNodeText || !newNodeTextDirection) return;
+    if (!newNodeText) {
+      toast({
+        description: "请输入节点内容",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!newNodeTextDirection) {
+      toast({
+        description: "请选择内容排列方向",
+        variant: "destructive",
+      });
+      return;
+    }
     const newKey = Math.max(...nodeDataArray.map((node) => node.key)) + 1;
     const text =
       newNodeTextDirection === "vertical"
@@ -207,7 +215,7 @@ function App() {
     const { from, to, shareRatio } = newLink;
     if (!from || !to || !shareRatio) return;
 
-    const newKey = Math.min(...linkDataArray.map((link) => link.key)) - 1;
+    const newKey = new Date().getTime();
     setLinkDataArray([
       ...linkDataArray,
       {
@@ -358,6 +366,7 @@ function App() {
           }
         }}
       />
+      <Toaster />
     </main>
   );
 }
