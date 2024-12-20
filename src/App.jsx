@@ -12,7 +12,8 @@ function initDiagram() {
     initialContentAlignment: go.Spot.Center,
     layout: $(go.TreeLayout, {
       angle: 90,
-      layerSpacing: 35,
+      layerSpacing: 80,    // 增加层间距
+      nodeSpacing: 50,     // 增加同层节点间距
       alignment: go.TreeLayout.AlignmentStart,
       arrangement: go.TreeLayout.ArrangementHorizontal,
     }),
@@ -48,16 +49,50 @@ function initDiagram() {
     go.Link,
     {
       routing: go.Link.Orthogonal,
-      corner: 5,
-      selectable: true
+      corner: 10,  // 增加圆角
+      selectable: true,
+      shadowOffset: new go.Point(0, 0),
+      shadowBlur: 3,
+      shadowColor: "rgba(0, 0, 0, 0.2)",  // 添加阴影效果
+      cursor: "pointer",
+      mouseEnter: (e, link) => {  // 鼠标悬停效果
+        const shape = link.findObject("SHAPE");  // 需要给 Shape 添加 name
+        if (shape) {
+          shape.stroke = "rgba(24, 144, 255, 1)";
+          shape.strokeWidth = 3;
+        }
+      },
+      mouseLeave: (e, link) => {  // 鼠标离开效果
+        const shape = link.findObject("SHAPE");
+        if (shape) {
+          shape.stroke = "rgba(24, 144, 255, 0.8)";
+          shape.strokeWidth = 2;
+        }
+      }
     },
-    $(go.Shape, { strokeWidth: 1.5, stroke: "#999" }),
-    $(go.Shape, { toArrow: "Standard" }),
+    // 主线条
+    $(go.Shape, {
+      name: "SHAPE",
+      strokeWidth: 2,
+      stroke: "rgba(24, 144, 255, 0.8)",  // 使用半透明的蓝色
+      strokeDashArray: [0, 0],  // 实线
+    }),
+    // 箭头
+    $(go.Shape, {
+      toArrow: "Triangle",
+      fill: "rgba(24, 144, 255, 0.8)",
+      stroke: null,
+      scale: 1.2  // 箭头稍大一些
+    }),
+    // 文本块
     $(go.TextBlock, {
-      segmentOffset: new go.Point(0, -10),
-      font: "12px 微软雅黑",
-      editable: true,  // 启用文本编辑
-    }, new go.Binding("text", "shareRatio", ratio => ratio + "%").makeTwoWay(text => 
+      segmentOffset: new go.Point(0, -16),  // 调整文本位置
+      font: "bold 12px 微软雅黑",
+      stroke: "#666",
+      background: "white",  // 文本背景
+      margin: 4,
+      editable: true,
+    }, new go.Binding("text", "shareRatio", ratio => ratio + "%").makeTwoWay(text =>
       parseInt(text.replace("%", "")) || 0
     ))
   );
@@ -81,7 +116,7 @@ function App() {
     { key: 2, text: "子公司B" },
     { key: 3, text: "参股公司" },
   ]);
-  
+
   const [linkDataArray, setLinkDataArray] = useState([
     { key: -1, from: 0, to: 1, shareRatio: 100 },
     { key: -2, from: 0, to: 2, shareRatio: 100 },
@@ -91,7 +126,7 @@ function App() {
 
   // 新增节点的表单状态
   const [newNodeText, setNewNodeText] = useState('');
-  
+
   // 新增连接的表单状态
   const [newLink, setNewLink] = useState({
     from: '',
@@ -113,7 +148,7 @@ function App() {
   const handleAddLink = () => {
     const { from, to, shareRatio } = newLink;
     if (!from || !to || !shareRatio) return;
-    
+
     const newKey = Math.min(...linkDataArray.map(link => link.key)) - 1;
     setLinkDataArray([
       ...linkDataArray,
@@ -124,14 +159,14 @@ function App() {
         shareRatio: parseInt(shareRatio)
       }
     ]);
-    
+
     setNewLink({ from: '', to: '', shareRatio: '' });
   };
 
   return (
     <main className="p-4">
       <h1 className="text-2xl font-bold mb-4">股权结构图</h1>
-      
+
       <div className="mb-4 space-y-4">
         <div className="flex gap-2">
           <Input
@@ -146,17 +181,17 @@ function App() {
           <Input
             placeholder="从节点(key)"
             value={newLink.from}
-            onChange={(e) => setNewLink({...newLink, from: e.target.value})}
+            onChange={(e) => setNewLink({ ...newLink, from: e.target.value })}
           />
           <Input
             placeholder="到节点(key)"
             value={newLink.to}
-            onChange={(e) => setNewLink({...newLink, to: e.target.value})}
+            onChange={(e) => setNewLink({ ...newLink, to: e.target.value })}
           />
           <Input
             placeholder="股权比例"
             value={newLink.shareRatio}
-            onChange={(e) => setNewLink({...newLink, shareRatio: e.target.value})}
+            onChange={(e) => setNewLink({ ...newLink, shareRatio: e.target.value })}
           />
           <Button onClick={handleAddLink}>添加连接</Button>
         </div>
