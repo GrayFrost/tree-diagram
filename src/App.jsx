@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import "./App.css";
 
 function initDiagram(showIndex) {
-  console.log('zzh hello', showIndex);
   const $ = go.GraphObject.make;
   const diagram = new go.Diagram({
     "undoManager.isEnabled": true,
@@ -47,7 +46,7 @@ function initDiagram(showIndex) {
         stroke: "#333",
         editable: true,
         textAlign: "center",
-        isMultiline: false,
+        isMultiline: true,
       }).bind(new go.Binding("text").makeTwoWay()),
       $(go.TextBlock, {
         name: "INDEX",
@@ -143,7 +142,7 @@ function App() {
   // 状态管理
   const [nodeDataArray, setNodeDataArray] = useState([
     { key: 0, text: "控股公司" },
-    { key: 1, text: "子公司A" },
+    { key: 1, text: "子\n公\n司\nA" },
     { key: 2, text: "子公司B" },
     { key: 3, text: "参股公司" },
   ]);
