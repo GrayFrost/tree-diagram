@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import "./App.css";
 
-function initDiagram(showIndex) {
+function initDiagram(showIndex, theme) {
   const $ = go.GraphObject.make;
   const diagram = new go.Diagram({
     "undoManager.isEnabled": true,
@@ -39,8 +39,9 @@ function initDiagram(showIndex) {
     go.Node,
     "Auto",
     $(go.Shape, "RoundedRectangle", {
+      name: "Shape",
       fill: "white",
-      stroke: "#1890ff",
+      stroke: theme.nodeStroke,
       strokeWidth: 2,
     }),
     $(
@@ -82,7 +83,10 @@ function initDiagram(showIndex) {
         // 鼠标悬停效果
         const shape = link.findObject("SHAPE"); // 需要给 Shape 添加 name
         if (shape) {
-          shape.stroke = "rgba(24, 144, 255, 1)";
+          // 获取当前主题的颜色，并调整透明度
+          const currentColor = shape.stroke;
+          const opaqueColor = currentColor.replace(/[\d.]+\)$/g, "1)");
+          shape.stroke = opaqueColor;
           shape.strokeWidth = 3;
         }
       },
@@ -90,7 +94,10 @@ function initDiagram(showIndex) {
         // 鼠标离开效果
         const shape = link.findObject("SHAPE");
         if (shape) {
-          shape.stroke = "rgba(24, 144, 255, 0.8)";
+          // 恢复到当前主题的颜色
+          const currentColor = shape.stroke;
+          const transparentColor = currentColor.replace(/[\d.]+\)$/g, "0.8)");
+          shape.stroke = transparentColor;
           shape.strokeWidth = 2;
         }
       },
@@ -99,13 +106,14 @@ function initDiagram(showIndex) {
     $(go.Shape, {
       name: "SHAPE",
       strokeWidth: 2,
-      stroke: "rgba(24, 144, 255, 0.8)", // 使用半透明的蓝色
+      stroke: theme.linkStroke, // 使用半透明的蓝色
       strokeDashArray: [0, 0], // 实线
     }),
     // 箭头
     $(go.Shape, {
+      name: "ARROW",
       toArrow: "Triangle",
-      fill: "rgba(24, 144, 255, 0.8)",
+      fill: theme.linkStroke,
       stroke: null,
       scale: 1.2, // 箭头稍大一些
     }),
@@ -148,6 +156,11 @@ function initDiagram(showIndex) {
 }
 
 function App() {
+  const [theme, setTheme] = useState({
+    nodeStroke: "#1890ff",
+    linkStroke: "rgba(24, 144, 255, 0.8)",
+    textStroke: "#333",
+  });
   // 状态管理
   const [nodeDataArray, setNodeDataArray] = useState([
     { key: 0, text: "控股公司" },
@@ -181,9 +194,10 @@ function App() {
   const handleAddNode = () => {
     if (!newNodeText || !newNodeTextDirection) return;
     const newKey = Math.max(...nodeDataArray.map((node) => node.key)) + 1;
-    const text = newNodeTextDirection === 'vertical'
-      ? newNodeText.split('').join('\n')  // 垂直排列时添加换行符
-      : newNodeText;  // 水平排列时保持原样
+    const text =
+      newNodeTextDirection === "vertical"
+        ? newNodeText.split("").join("\n") // 垂直排列时添加换行符
+        : newNodeText; // 水平排列时保持原样
     setNodeDataArray([...nodeDataArray, { key: newKey, text: text }]);
     setNewNodeText("");
     setNewNodeTextDirection("");
@@ -215,6 +229,58 @@ function App() {
         const indexText = node.findObject("INDEX");
         if (indexText) {
           indexText.visible = !showNodeIndex;
+        }
+      });
+      diagram.requestUpdate();
+    }
+  };
+
+  const toggleTheme = () => {
+    const themes = {
+      blue: {
+        nodeStroke: "#1890ff",
+        linkStroke: "rgba(24, 144, 255, 0.8)",
+        textStroke: "#333",
+      },
+      green: {
+        nodeStroke: "#52c41a",
+        linkStroke: "rgba(82, 196, 26, 0.8)",
+        textStroke: "#444",
+      },
+      purple: {
+        nodeStroke: "#722ed1",
+        linkStroke: "rgba(114, 46, 209, 0.8)",
+        textStroke: "#555",
+      },
+    };
+
+    // 循环切换主题
+    const currentTheme = Object.values(themes).findIndex(
+      (t) => t.nodeStroke === theme.nodeStroke
+    );
+    const nextTheme =
+      Object.values(themes)[(currentTheme + 1) % Object.values(themes).length];
+    setTheme(nextTheme);
+
+    const diagram = diagramRef.current?.getDiagram();
+    if (diagram) {
+      // 更新节点样式
+      diagram.nodes.each((node) => {
+        const shape = node.findObject("Shape");
+        if (shape) {
+          shape.stroke = nextTheme.nodeStroke;
+        }
+      });
+
+      // 更新连接线样式
+      diagram.links.each((link) => {
+        const shape = link.findObject("SHAPE");
+        const arrow = link.findObject("ARROW");
+        if (shape) {
+          shape.stroke = nextTheme.linkStroke;
+        }
+        if (arrow) {
+          arrow.fill = nextTheme.linkStroke;
         }
       });
       diagram.requestUpdate();
@@ -253,6 +319,9 @@ function App() {
         <Button variant="outline" onClick={handleToggleIndex}>
           {showNodeIndex ? "隐藏节点序号" : "显示节点序号"}
         </Button>
+        <Button variant="outline" onClick={toggleTheme}>
+          切换主题颜色
+        </Button>
 
         <div className="flex gap-2">
           <Input
@@ -275,10 +344,10 @@ function App() {
           <Button onClick={handleAddLink}>添加连接</Button>
         </div>
       </div>
-      {showNodeIndex ? "显示" : "隐藏"}
+
       <ReactDiagram
         ref={diagramRef}
-        initDiagram={() => initDiagram(showNodeIndex)}
+        initDiagram={() => initDiagram(showNodeIndex, theme)}
         divClassName="diagram-component"
         nodeDataArray={nodeDataArray}
         linkDataArray={linkDataArray}
