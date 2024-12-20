@@ -3,6 +3,15 @@ import * as go from "gojs";
 import { ReactDiagram } from "gojs-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import "./App.css";
 
 function initDiagram(showIndex) {
@@ -127,7 +136,7 @@ function initDiagram(showIndex) {
 
   diagram.addDiagramListener("InitialLayoutCompleted", (e) => {
     const diagram = e.diagram;
-    diagram.nodes.each(node => {
+    diagram.nodes.each((node) => {
       const indexText = node.findObject("INDEX");
       if (indexText) {
         indexText.visible = showIndex;
@@ -156,6 +165,7 @@ function App() {
 
   // 新增节点的表单状态
   const [newNodeText, setNewNodeText] = useState("");
+  const [newNodeTextDirection, setNewNodeTextDirection] = useState("");
 
   // 新增连接的表单状态
   const [newLink, setNewLink] = useState({
@@ -169,10 +179,14 @@ function App() {
 
   // 添加新节点
   const handleAddNode = () => {
-    if (!newNodeText) return;
+    if (!newNodeText || !newNodeTextDirection) return;
     const newKey = Math.max(...nodeDataArray.map((node) => node.key)) + 1;
-    setNodeDataArray([...nodeDataArray, { key: newKey, text: newNodeText }]);
+    const text = newNodeTextDirection === 'vertical' 
+    ? newNodeText.split('').join('\n')  // 垂直排列时添加换行符
+    : newNodeText;  // 水平排列时保持原样
+    setNodeDataArray([...nodeDataArray, { key: newKey, text: text }]);
     setNewNodeText("");
+    setNewNodeTextDirection("");
   };
 
   const handleAddLink = () => {
@@ -197,7 +211,7 @@ function App() {
     setShowNodeIndex(!showNodeIndex);
     const diagram = diagramRef.current?.getDiagram();
     if (diagram) {
-      diagram.nodes.each(node => {
+      diagram.nodes.each((node) => {
         const indexText = node.findObject("INDEX");
         if (indexText) {
           indexText.visible = !showNodeIndex;
@@ -205,7 +219,7 @@ function App() {
       });
       diagram.requestUpdate();
     }
-  }
+  };
 
   return (
     <main className="p-4">
@@ -218,13 +232,25 @@ function App() {
             value={newNodeText}
             onChange={(e) => setNewNodeText(e.target.value)}
           />
+          <Select
+          value={newNodeTextDirection} 
+          onValueChange={setNewNodeTextDirection}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="文字排列方向" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>文字排列方向</SelectLabel>
+                <SelectItem value="horizontal">水平</SelectItem>
+                <SelectItem value="vertical">垂直</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <Button onClick={handleAddNode}>添加节点</Button>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={handleToggleIndex}
-        >
+        <Button variant="outline" onClick={handleToggleIndex}>
           {showNodeIndex ? "隐藏节点序号" : "显示节点序号"}
         </Button>
 
@@ -249,7 +275,7 @@ function App() {
           <Button onClick={handleAddLink}>添加连接</Button>
         </div>
       </div>
-      {showNodeIndex ? '显示' : '隐藏'}
+      {showNodeIndex ? "显示" : "隐藏"}
       <ReactDiagram
         ref={diagramRef}
         initDiagram={() => initDiagram(showNodeIndex)}
