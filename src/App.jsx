@@ -181,9 +181,9 @@ function App() {
   const handleAddNode = () => {
     if (!newNodeText || !newNodeTextDirection) return;
     const newKey = Math.max(...nodeDataArray.map((node) => node.key)) + 1;
-    const text = newNodeTextDirection === 'vertical' 
-    ? newNodeText.split('').join('\n')  // 垂直排列时添加换行符
-    : newNodeText;  // 水平排列时保持原样
+    const text = newNodeTextDirection === 'vertical'
+      ? newNodeText.split('').join('\n')  // 垂直排列时添加换行符
+      : newNodeText;  // 水平排列时保持原样
     setNodeDataArray([...nodeDataArray, { key: newKey, text: text }]);
     setNewNodeText("");
     setNewNodeTextDirection("");
@@ -233,8 +233,8 @@ function App() {
             onChange={(e) => setNewNodeText(e.target.value)}
           />
           <Select
-          value={newNodeTextDirection} 
-          onValueChange={setNewNodeTextDirection}
+            value={newNodeTextDirection}
+            onValueChange={setNewNodeTextDirection}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="文字排列方向" />
