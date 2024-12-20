@@ -40,6 +40,18 @@ function initDiagram(showIndex, theme) {
   diagram.nodeTemplate = $(
     go.Node,
     "Auto",
+    {
+      selectionAdornmentTemplate: $(
+        go.Adornment,
+        "Auto",
+        $(go.Shape, "RoundedRectangle", {
+          fill: null,
+          stroke: theme.nodeStroke,
+          strokeWidth: 3,
+        }),
+        $(go.Placeholder)
+      )
+    },
     $(go.Shape, "RoundedRectangle", {
       name: "Shape",
       fill: "white",
@@ -209,6 +221,26 @@ function App() {
     setNodeDataArray([...nodeDataArray, { key: newKey, text: text }]);
     setNewNodeText("");
     setNewNodeTextDirection("");
+
+    setTimeout(() => {
+      const diagram = diagramRef.current?.getDiagram();
+      if (diagram) {
+        diagram.nodes.each((node) => {
+          // 同步 index 显示
+          const indexText = node.findObject("INDEX");
+          if (indexText) {
+            indexText.visible = showNodeIndex;
+          }
+          // 同步主题颜色
+          const shape = node.findObject("Shape");
+          if (shape) {
+            shape.stroke = theme.nodeStroke;
+          }
+        });
+        diagram.requestUpdate();
+      }
+    }, 0)
+
   };
 
   const handleAddLink = () => {
