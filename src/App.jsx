@@ -49,13 +49,17 @@ function initDiagram() {
     {
       routing: go.Link.Orthogonal,
       corner: 5,
+      selectable: true
     },
     $(go.Shape, { strokeWidth: 1.5, stroke: "#999" }),
     $(go.Shape, { toArrow: "Standard" }),
     $(go.TextBlock, {
       segmentOffset: new go.Point(0, -10),
       font: "12px 微软雅黑",
-    }).bind("text", "shareRatio", (ratio) => ratio + "%")
+      editable: true,  // 启用文本编辑
+    }, new go.Binding("text", "shareRatio", ratio => ratio + "%").makeTwoWay(text => 
+      parseInt(text.replace("%", "")) || 0
+    ))
   );
 
   diagram.addModelChangedListener(function (evt) {
