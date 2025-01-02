@@ -77,7 +77,29 @@ export function useDiagram() {
 
   const handleAddLink = () => {
     const { from, to, shareRatio } = newLink;
-    if (!from || !to || !shareRatio) return;
+    // if (!from || !to || !shareRatio) return;
+    if (['', null, undefined].includes(from) || from < 0) {
+      toast({
+        description: "请选择开始连接的节点",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (['', null, undefined].includes(to) || to < 0) {
+      toast({
+        description: "请选择结束连接的节点",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!shareRatio) {
+      toast({
+        description: "请输入股权比例",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const newKey = new Date().getTime();
     setLinkDataArray([
