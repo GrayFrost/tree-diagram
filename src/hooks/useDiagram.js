@@ -17,7 +17,7 @@ export function useDiagram() {
 
   // 新增节点的表单状态
   const [newNodeText, setNewNodeText] = useState("");
-  const [newNodeTextDirection, setNewNodeTextDirection] = useState("");
+  const [newNodeTextDirection, setNewNodeTextDirection] = useState("horizontal");
 
   // 新增连接的表单状态
   const [newLink, setNewLink] = useState({
@@ -52,7 +52,7 @@ export function useDiagram() {
         : newNodeText; // 水平排列时保持原样
     setNodeDataArray([...nodeDataArray, { key: newKey, text: text }]);
     setNewNodeText("");
-    setNewNodeTextDirection("");
+    setNewNodeTextDirection("horizontal");
 
     setTimeout(() => {
       const diagram = diagramRef.current?.getDiagram();
