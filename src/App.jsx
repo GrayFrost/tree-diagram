@@ -8,6 +8,7 @@ import { initDiagram } from "./components/diagram/DiagramConfig";
 import { useDiagram } from "./hooks/useDiagram";
 import { Loading } from "./components/loading";
 import "./App.css";
+import { ThemeSelect } from "./components/diagram/ThemeSelect";
 
 function App() {
   const {
@@ -27,9 +28,9 @@ function App() {
     handleAddNode,
     handleAddLink,
     handleToggleIndex,
-    toggleTheme,
     isLoading,
     setIsLoading,
+    handleThemeChange,
   } = useDiagram();
 
   useEffect(() => {
@@ -55,12 +56,12 @@ function App() {
           setNewNodeTextDirection={setNewNodeTextDirection}
           handleAddNode={handleAddNode}
         />
-        <Button variant="outline" onClick={handleToggleIndex}>
-          {showNodeIndex ? "隐藏节点序号" : "显示节点序号"}
-        </Button>
-        <Button variant="outline" onClick={toggleTheme}>
-          切换主题颜色
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleToggleIndex}>
+            {showNodeIndex ? "隐藏节点序号" : "显示节点序号"}
+          </Button>
+          <ThemeSelect handleThemeChange={handleThemeChange} />
+        </div>
         <LinkForm
           newLink={newLink}
           setNewLink={setNewLink}

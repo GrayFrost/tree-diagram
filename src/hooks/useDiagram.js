@@ -1,14 +1,34 @@
 import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
-export function useDiagram() {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [theme, setTheme] = useState({
+// 添加主题配置对象
+const themes = {
+  gray: {
+    nodeStroke: "#666666",
+    linkStroke: "rgba(102, 102, 102, 0.8)",
+    textStroke: "#333",
+  },
+  blue: {
     nodeStroke: "#1890ff",
     linkStroke: "rgba(24, 144, 255, 0.8)",
     textStroke: "#333",
-  });
+  },
+  green: {
+    nodeStroke: "#52c41a",
+    linkStroke: "rgba(82, 196, 26, 0.8)",
+    textStroke: "#444",
+  },
+  purple: {
+    nodeStroke: "#722ed1",
+    linkStroke: "rgba(114, 46, 209, 0.8)",
+    textStroke: "#555",
+  },
+};
+
+export function useDiagram() {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+  const [theme, setTheme] = useState(themes.gray); // 设置默认灰色主题
   // 状态管理
   const [nodeDataArray, setNodeDataArray] = useState([
     { key: 0, text: "控股公司" },
@@ -147,31 +167,8 @@ export function useDiagram() {
     }
   };
 
-  const toggleTheme = () => {
-    const themes = {
-      blue: {
-        nodeStroke: "#1890ff",
-        linkStroke: "rgba(24, 144, 255, 0.8)",
-        textStroke: "#333",
-      },
-      green: {
-        nodeStroke: "#52c41a",
-        linkStroke: "rgba(82, 196, 26, 0.8)",
-        textStroke: "#444",
-      },
-      purple: {
-        nodeStroke: "#722ed1",
-        linkStroke: "rgba(114, 46, 209, 0.8)",
-        textStroke: "#555",
-      },
-    };
-
-    // 循环切换主题
-    const currentTheme = Object.values(themes).findIndex(
-      (t) => t.nodeStroke === theme.nodeStroke
-    );
-    const nextTheme =
-      Object.values(themes)[(currentTheme + 1) % Object.values(themes).length];
+  const handleThemeChange = (value) => {
+    const nextTheme = themes[value];
     setTheme(nextTheme);
 
     const diagram = diagramRef.current?.getDiagram();
@@ -216,7 +213,7 @@ export function useDiagram() {
     handleAddNode,
     handleAddLink,
     handleToggleIndex,
-    toggleTheme,
+    handleThemeChange,
     isLoading,
     setIsLoading,
   };
