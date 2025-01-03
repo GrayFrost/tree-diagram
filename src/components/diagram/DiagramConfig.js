@@ -1,18 +1,34 @@
-import * as go from 'gojs';
+import { 
+  Diagram,
+  GraphObject,
+  Point,
+  Spot,
+  TreeLayout,
+  Shape,
+  Panel,
+  TextBlock,
+  Node,
+  Link,
+  Binding,
+  Adornment,
+  GraphLinksModel,
+  Placeholder,
+  Margin,
+} from 'gojs';
 
 export function initDiagram(showIndex, theme) {
-  const $ = go.GraphObject.make;
-  const diagram = new go.Diagram({
+  const $ = GraphObject.make;
+  const diagram = new Diagram({
     "undoManager.isEnabled": true,
-    initialContentAlignment: go.Spot.Center,
-    layout: $(go.TreeLayout, {
+    initialContentAlignment: Spot.Center,
+    layout: $(TreeLayout, {
       angle: 90,
       layerSpacing: 80, // 增加层间距
       nodeSpacing: 50, // 增加同层节点间距
-      alignment: go.TreeLayout.AlignmentStart,
-      arrangement: go.TreeLayout.ArrangementHorizontal,
+      alignment: TreeLayout.AlignmentStart,
+      arrangement: TreeLayout.ArrangementHorizontal,
     }),
-    model: new go.GraphLinksModel({
+    model: new GraphLinksModel({
       linkKeyProperty: "key",
       // 添加股权比例属性
       linkFromPortIdProperty: "fromPort",
@@ -22,43 +38,43 @@ export function initDiagram(showIndex, theme) {
 
   // 节点模板
   diagram.nodeTemplate = $(
-    go.Node,
+    Node,
     "Auto",
     {
       selectionAdornmentTemplate: $(
-        go.Adornment,
+        Adornment,
         "Auto",
-        $(go.Shape, "RoundedRectangle", {
+        $(Shape, "RoundedRectangle", {
           fill: null,
           stroke: theme.nodeStroke,
           strokeWidth: 3,
         }),
-        $(go.Placeholder)
+        $(Placeholder)
       )
     },
-    $(go.Shape, "RoundedRectangle", {
+    $(Shape, "RoundedRectangle", {
       name: "Shape",
       fill: "white",
       stroke: theme.nodeStroke,
       strokeWidth: 2,
     }),
     $(
-      go.Panel,
+      Panel,
       "Vertical",
       {
-        defaultAlignment: go.Spot.Center,
+        defaultAlignment: Spot.Center,
       },
-      $(go.TextBlock, {
+      $(TextBlock, {
         margin: 8,
         font: "bold 14px 微软雅黑",
         stroke: "#333",
         editable: true,
         textAlign: "center",
         isMultiline: true,
-      }).bind(new go.Binding("text").makeTwoWay()),
-      $(go.TextBlock, {
+      }).bind(new Binding("text").makeTwoWay()),
+      $(TextBlock, {
         name: "INDEX",
-        margin: new go.Margin(0, 0, 4, 0),
+        margin: new Margin(0, 0, 4, 0),
         font: "12px 微软雅黑",
         stroke: "#666",
         visible: showIndex, // 根据状态控制显示
@@ -68,12 +84,12 @@ export function initDiagram(showIndex, theme) {
 
   // 连接线模板
   diagram.linkTemplate = $(
-    go.Link,
+    Link,
     {
-      routing: go.Link.Orthogonal,
+      routing: Link.Orthogonal,
       corner: 10, // 增加圆角
       selectable: true,
-      shadowOffset: new go.Point(0, 0),
+      shadowOffset: new Point(0, 0),
       shadowBlur: 3,
       shadowColor: "rgba(0, 0, 0, 0.2)", // 添加阴影效果
       cursor: "pointer",
@@ -101,14 +117,14 @@ export function initDiagram(showIndex, theme) {
       },
     },
     // 主线条
-    $(go.Shape, {
+    $(Shape, {
       name: "SHAPE",
       strokeWidth: 2,
       stroke: theme.linkStroke, // 使用半透明的蓝色
       strokeDashArray: [0, 0], // 实线
     }),
     // 箭头
-    $(go.Shape, {
+    $(Shape, {
       name: "ARROW",
       toArrow: "Triangle",
       fill: theme.linkStroke,
@@ -117,16 +133,16 @@ export function initDiagram(showIndex, theme) {
     }),
     // 文本块
     $(
-      go.TextBlock,
+      TextBlock,
       {
-        segmentOffset: new go.Point(0, -16), // 调整文本位置
+        segmentOffset: new Point(0, -16), // 调整文本位置
         font: "bold 12px 微软雅黑",
         stroke: "#666",
         background: "white", // 文本背景
         margin: 4,
         editable: true,
       },
-      new go.Binding("text", "shareRatio", (ratio) => ratio + "%").makeTwoWay(
+      new Binding("text", "shareRatio", (ratio) => ratio + "%").makeTwoWay(
         (text) => parseInt(text.replace("%", "")) || 0
       )
     )
@@ -148,6 +164,10 @@ export function initDiagram(showIndex, theme) {
         indexText.visible = showIndex;
       }
     });
+    // 添加延迟以确保图表完全渲染
+    setTimeout(() => {
+      window.dispatchEvent(new Event('diagramLoaded'));
+    }, 100);
   });
 
   return diagram;

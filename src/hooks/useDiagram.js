@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function useDiagram() {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState({
     nodeStroke: "#1890ff",
     linkStroke: "rgba(24, 144, 255, 0.8)",
@@ -216,5 +217,7 @@ export function useDiagram() {
     handleAddLink,
     handleToggleIndex,
     toggleTheme,
+    isLoading,
+    setIsLoading,
   };
 }

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { ReactDiagram } from "gojs-react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
@@ -5,6 +6,7 @@ import { NodeForm } from "./components/diagram/NodeForm";
 import { LinkForm } from "./components/diagram/LinkForm";
 import { initDiagram } from "./components/diagram/DiagramConfig";
 import { useDiagram } from "./hooks/useDiagram";
+import { Loading } from "./components/loading";
 import "./App.css";
 
 function App() {
@@ -26,10 +28,23 @@ function App() {
     handleAddLink,
     handleToggleIndex,
     toggleTheme,
+    isLoading,
+    setIsLoading,
   } = useDiagram();
+
+  useEffect(() => {
+    const handleDiagramLoaded = () => {
+      setIsLoading(false);
+    };
+    window.addEventListener('diagramLoaded', handleDiagramLoaded);
+    return () => {
+      window.removeEventListener('diagramLoaded', handleDiagramLoaded);
+    };
+  }, [setIsLoading]);
 
   return (
     <main className="p-4">
+      {isLoading && <Loading />}
       <h1 className="text-2xl font-bold mb-4">股权结构图</h1>
 
       <div className="mb-4 space-y-4">
