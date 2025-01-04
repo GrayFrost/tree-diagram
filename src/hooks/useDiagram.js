@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 // 添加主题配置对象
@@ -49,6 +49,30 @@ export function useDiagram() {
 
   const [showNodeIndex, setShowNodeIndex] = useState(false);
   const diagramRef = useRef(null);
+
+  useEffect(() => {
+    // 添加删除节点的事件监听
+    const handleNodeDeleted = (event) => {
+      const { deletedNodes, deletedLinks } = event.detail;
+      
+      // 更新节点数组
+      setNodeDataArray(prevNodes => 
+        prevNodes.filter(node => !deletedNodes.includes(node.key))
+      );
+      
+      // 更新连接线数组
+      setLinkDataArray(prevLinks => 
+        prevLinks.filter(link => !deletedLinks.includes(link.key))
+      );
+    };
+
+    window.addEventListener('nodeDeleted', handleNodeDeleted);
+    
+    // 清理函数
+    return () => {
+      window.removeEventListener('nodeDeleted', handleNodeDeleted);
+    };
+  }, []);
 
   // 添加新节点
   const handleAddNode = () => {

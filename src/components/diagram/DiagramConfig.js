@@ -23,18 +23,50 @@ export function initDiagram(showIndex, theme) {
     initialContentAlignment: Spot.Center,
     layout: $(TreeLayout, {
       angle: 90,
-      layerSpacing: 80, // 增加层间距
-      nodeSpacing: 50, // 增加同层节点间距
+      layerSpacing: 80,
+      nodeSpacing: 50,
       alignment: TreeLayout.AlignmentStart,
       arrangement: TreeLayout.ArrangementHorizontal,
     }),
     model: new GraphLinksModel({
       linkKeyProperty: "key",
-      // 添加股权比例属性
       linkFromPortIdProperty: "fromPort",
       linkToPortIdProperty: "toPort",
-    }),
+    })
   });
+
+  // 重写删除命令
+  diagram.commandHandler.doKeyDown = function() {
+    const e = diagram.lastInput;
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      const selection = diagram.selection.toArray();
+      if (selection.length > 0) {
+        const deletedNodes = selection
+          .filter(part => part instanceof Node)
+          .map(node => node.data.key);
+        const deletedLinks = selection
+          .filter(part => part instanceof Link)
+          .map(link => link.data.key);
+          
+        // 先触发事件
+        window.dispatchEvent(new CustomEvent('nodeDeleted', {
+          detail: { deletedNodes, deletedLinks }
+        }));
+        
+        // 使用 model 的方法来删除节点和连接线
+        diagram.model.startTransaction('delete');
+        selection.forEach(part => {
+          if (part instanceof Node) {
+            diagram.model.removeNodeData(part.data);
+          } else if (part instanceof Link) {
+            diagram.model.removeLinkData(part.data);
+          }
+        });
+        diagram.model.commitTransaction('delete');
+      }
+      e.handled = true;
+    }
+  };
 
   // 节点模板
   diagram.nodeTemplate = $(
