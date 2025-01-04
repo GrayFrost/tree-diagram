@@ -157,7 +157,7 @@ export function useDiagram() {
         key: newKey,
         from: parseInt(from),
         to: parseInt(to),
-        shareRatio: parseInt(shareRatio),
+        shareRatio: parseFloat(shareRatio),
       },
     ]);
 

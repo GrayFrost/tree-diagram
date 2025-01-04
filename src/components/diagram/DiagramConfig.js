@@ -175,7 +175,7 @@ export function initDiagram(showIndex, theme) {
         editable: true,
       },
       new Binding("text", "shareRatio", (ratio) => ratio + "%").makeTwoWay(
-        (text) => parseInt(text.replace("%", "")) || 0
+        (text) => parseFloat(text.replace("%", "")) || 0
       )
     )
   );
