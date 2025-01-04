@@ -29,12 +29,16 @@ export function useDiagram() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState(themes.gray); // 设置默认灰色主题
-  // 状态管理
-  const [nodeDataArray, setNodeDataArray] = useState([
-    { key: 0, text: "控股公司" },
-  ]);
-
-  const [linkDataArray, setLinkDataArray] = useState([]);
+  // 从 SessionStorage 恢复数据
+  const savedData = JSON.parse(sessionStorage.getItem('diagramData') || '{}');
+  
+  // 修改初始状态
+  const [nodeDataArray, setNodeDataArray] = useState(
+    savedData.nodes || [{ key: 0, text: "控股公司" }]
+  );
+  const [linkDataArray, setLinkDataArray] = useState(
+    savedData.links || []
+  );
 
   // 新增节点的表单状态
   const [newNodeText, setNewNodeText] = useState("");
@@ -219,7 +223,17 @@ export function useDiagram() {
       diagram.requestUpdate();
     }
   };
-  
+
+  // 添加清除数据的方法（可选）
+  const handleClearData = () => {
+    sessionStorage.removeItem('diagramData');
+    setNodeDataArray([{ key: 0, text: "控股公司" }]);
+    setLinkDataArray([]);
+    toast({
+      description: "数据已清除",
+    });
+  };
+
   return {
     theme,
     nodeDataArray,
@@ -240,5 +254,6 @@ export function useDiagram() {
     handleThemeChange,
     isLoading,
     setIsLoading,
+    handleClearData,
   };
 }

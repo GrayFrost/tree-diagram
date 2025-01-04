@@ -182,9 +182,13 @@ export function initDiagram(showIndex, theme) {
 
   diagram.addModelChangedListener(function (evt) {
     if (evt.isTransactionFinished) {
-      const data = evt.model.toJson();
-      console.log("图表数据已更新:", data);
-      // 这里可以添加您的数据保存逻辑
+      const data = {
+        nodes: diagram.model.nodeDataArray,
+        links: diagram.model.linkDataArray,
+        timestamp: new Date().getTime()
+      };
+      sessionStorage.setItem('diagramData', JSON.stringify(data));
+      console.log("图表数据已保存到 SessionStorage");
     }
   });
 

@@ -31,6 +31,7 @@ function App() {
     isLoading,
     setIsLoading,
     handleThemeChange,
+    handleClearData,
   } = useDiagram();
 
   useEffect(() => {
@@ -61,6 +62,9 @@ function App() {
             {showNodeIndex ? "隐藏节点序号" : "显示节点序号"}
           </Button>
           <ThemeSelect handleThemeChange={handleThemeChange} />
+          <Button variant="destructive" onClick={handleClearData}>
+            清除数据
+          </Button>
         </div>
         <LinkForm
           newLink={newLink}
