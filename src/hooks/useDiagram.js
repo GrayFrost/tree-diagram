@@ -97,7 +97,7 @@ export function useDiagram() {
     const newKey = Math.max(...nodeDataArray.map((node) => node.key)) + 1;
     const text =
       newNodeTextDirection === "vertical"
-        ? newNodeText.split("").join("\n") // 垂直排列时添加换行符
+        ? newNodeText.split("").join("\n").replace("（", "︵").replace("）", "︶") // 垂直排列时添加换行符
         : newNodeText; // 水平排列时保持原样
     setNodeDataArray([...nodeDataArray, { key: newKey, text: text }]);
     setNewNodeText("");
