@@ -78,6 +78,19 @@ export function useDiagram() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleNodeDoubleClicked = (event) => {
+      const { nodeKey } = event.detail;
+      handleToggleTextDirection(nodeKey);
+    };
+
+    window.addEventListener('nodeDoubleClicked', handleNodeDoubleClicked);
+    
+    return () => {
+      window.removeEventListener('nodeDoubleClicked', handleNodeDoubleClicked);
+    };
+  }, []);
+
   // 添加新节点
   const handleAddNode = () => {
     if (!newNodeText) {
@@ -234,6 +247,31 @@ export function useDiagram() {
     });
   };
 
+  const handleToggleTextDirection = (nodeKey) => {
+    const diagram = diagramRef.current?.getDiagram();
+    if (!diagram) return;
+
+    // 从图表中获取当前节点的最新文本
+    const node = diagram.findNodeForKey(nodeKey);
+    if (!node) return;
+    
+    const currentText = node.data.text;
+    
+    setNodeDataArray(prevNodes => 
+      prevNodes.map(node => {
+        if (node.key === nodeKey) {
+          const isVertical = currentText.includes('\n');
+          const text = isVertical
+            ? currentText.replace(/\n/g, '').replace('︵', '（').replace('︶', '）')
+            : currentText.split('').join('\n').replace('（', '︵').replace('）', '︶');
+          
+          return { ...node, text };
+        }
+        return node;
+      })
+    );
+  };
+
   return {
     theme,
     nodeDataArray,
@@ -255,5 +293,6 @@ export function useDiagram() {
     isLoading,
     setIsLoading,
     handleClearData,
+    handleToggleTextDirection,
   };
 }

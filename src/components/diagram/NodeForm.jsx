@@ -12,25 +12,28 @@ import {
 
 export function NodeForm({ newNodeText, setNewNodeText, newNodeTextDirection, setNewNodeTextDirection, handleAddNode }) {
   return (
-    <div className="flex gap-2">
-      <Input
-        placeholder="输入节点名称"
-        value={newNodeText}
-        onChange={(e) => setNewNodeText(e.target.value)}
-      />
-      <Select value={newNodeTextDirection} onValueChange={setNewNodeTextDirection}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="文字排列方向" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>文字排列方向</SelectLabel>
-            <SelectItem value="horizontal">水平</SelectItem>
-            <SelectItem value="vertical">垂直</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-      <Button onClick={handleAddNode}>添加节点</Button>
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2">
+        <Input
+          placeholder="输入节点名称"
+          value={newNodeText}
+          onChange={(e) => setNewNodeText(e.target.value)}
+        />
+        <Select value={newNodeTextDirection} onValueChange={setNewNodeTextDirection}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="文字排列方向" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>文字排列方向</SelectLabel>
+              <SelectItem value="horizontal">水平</SelectItem>
+              <SelectItem value="vertical">垂直</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <Button onClick={handleAddNode}>添加节点</Button>
+      </div>
+      <p className="text-sm text-muted-foreground">提示：双击节点可以切换文字排列方向</p>
     </div>
   );
 }

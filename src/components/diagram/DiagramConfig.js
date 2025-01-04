@@ -73,6 +73,12 @@ export function initDiagram(showIndex, theme) {
     Node,
     "Auto",
     {
+      doubleClick: (e, node) => {
+        // 触发自定义事件
+        window.dispatchEvent(new CustomEvent('nodeDoubleClicked', {
+          detail: { nodeKey: node.data.key }
+        }));
+      },
       selectionAdornmentTemplate: $(
         Adornment,
         "Auto",
