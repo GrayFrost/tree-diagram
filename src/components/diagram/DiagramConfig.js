@@ -125,7 +125,7 @@ export function initDiagram(showIndex, theme) {
     Link,
     {
       routing: Link.Orthogonal,
-      corner: 10, // 增加圆角
+      corner: 0, // 增加圆角
       selectable: true,
       shadowOffset: new Point(0, 0),
       shadowBlur: 3,
