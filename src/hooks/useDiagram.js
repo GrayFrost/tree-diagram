@@ -34,7 +34,7 @@ export function useDiagram() {
   
   // 修改初始状态
   const [nodeDataArray, setNodeDataArray] = useState(
-    savedData.nodes || [{ key: 0, text: "控股公司" }]
+    savedData.nodes || []
   );
   const [linkDataArray, setLinkDataArray] = useState(
     savedData.links || []
@@ -94,11 +94,14 @@ export function useDiagram() {
       });
       return;
     }
-    const newKey = Math.max(...nodeDataArray.map((node) => node.key)) + 1;
+    const newKey = nodeDataArray.length === 0 
+      ? 0 
+      : Math.max(...nodeDataArray.map((node) => node.key)) + 1;
+    
     const text =
       newNodeTextDirection === "vertical"
-        ? newNodeText.split("").join("\n").replace("（", "︵").replace("）", "︶") // 垂直排列时添加换行符
-        : newNodeText; // 水平排列时保持原样
+        ? newNodeText.split("").join("\n").replace("（", "︵").replace("）", "︶")
+        : newNodeText;
     setNodeDataArray([...nodeDataArray, { key: newKey, text: text }]);
     setNewNodeText("");
     setNewNodeTextDirection("horizontal");
@@ -107,12 +110,10 @@ export function useDiagram() {
       const diagram = diagramRef.current?.getDiagram();
       if (diagram) {
         diagram.nodes.each((node) => {
-          // 同步 index 显示
           const indexText = node.findObject("INDEX");
           if (indexText) {
             indexText.visible = showNodeIndex;
           }
-          // 同步主题颜色
           const shape = node.findObject("Shape");
           if (shape) {
             shape.stroke = theme.nodeStroke;
@@ -121,7 +122,6 @@ export function useDiagram() {
         diagram.requestUpdate();
       }
     }, 0)
-
   };
 
   const handleAddLink = () => {
@@ -227,7 +227,7 @@ export function useDiagram() {
   // 添加清除数据的方法（可选）
   const handleClearData = () => {
     sessionStorage.removeItem('diagramData');
-    setNodeDataArray([{ key: 0, text: "控股公司" }]);
+    setNodeDataArray([]);
     setLinkDataArray([]);
     toast({
       description: "数据已清除",
